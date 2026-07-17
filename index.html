@@ -39,8 +39,11 @@ body { font-family:'Inter',sans-serif; background:#0f172a; color:#f8fafc; overfl
 .btn { cursor:pointer; transition:opacity 0.2s; }
 .btn:active { opacity:0.7; }
 </style>
+
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="gradient-hero">
+<div id="js-test" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#ef4444;color:white;text-align:center;padding:4px;font-size:12px;font-weight:bold;">⚠️ JavaScript not working - buttons will not function</div>
 
 <header class="sticky top-0 z-40 glass px-4 py-3">
   <div class="flex items-center justify-between max-w-lg mx-auto">
@@ -499,205 +502,225 @@ body { font-family:'Inter',sans-serif; background:#0f172a; color:#f8fafc; overfl
 </div>
 
 <script>
-// ===== COUNTDOWN TIMER =====
-function updateCountdown() {
-  const now = new Date();
-  const target = new Date();
-  target.setHours(18, 50, 0, 0);
+// Wrap everything in DOMContentLoaded to ensure DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('APP LOADED');
 
-  // If it's past 18:50 today, show "BOARDING NOW" or "BOARDED"
-  const diff = target - now;
-  const timerEl = document.getElementById('countdown-timer');
-  const statusEl = document.getElementById('preboard-status');
-  const sectionEl = document.getElementById('preboard-section');
+  // Hide JS error banner
+  var testEl = document.getElementById('js-test');
+  if (testEl) testEl.style.display = 'none';
 
-  if (!timerEl) return;
+  // ===== COUNTDOWN TIMER =====
+  function updateCountdown() {
+    var now = new Date();
+    var target = new Date();
+    target.setHours(18, 50, 0, 0);
 
-  if (diff <= 0) {
-    // Check if past departure time (19:50)
-    const departure = new Date();
-    departure.setHours(19, 50, 0, 0);
-    if (now >= departure) {
-      timerEl.textContent = "DEPARTED";
-      statusEl.textContent = "ONBOARD";
-      sectionEl.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-    } else {
-      timerEl.textContent = "BOARDING NOW";
-      statusEl.textContent = "GO TO GATE";
-      sectionEl.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+    var diff = target - now;
+    var timerEl = document.getElementById('countdown-timer');
+    var statusEl = document.getElementById('preboard-status');
+    var sectionEl = document.getElementById('preboard-section');
+
+    if (!timerEl) return;
+
+    if (diff <= 0) {
+      var departure = new Date();
+      departure.setHours(19, 50, 0, 0);
+      if (now >= departure) {
+        timerEl.textContent = "DEPARTED";
+        if (statusEl) statusEl.textContent = "ONBOARD";
+        if (sectionEl) sectionEl.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+      } else {
+        timerEl.textContent = "BOARDING NOW";
+        if (statusEl) statusEl.textContent = "GO TO GATE";
+        if (sectionEl) sectionEl.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+      }
+      return;
     }
-    return;
+
+    var hours = Math.floor(diff / 3600000);
+    var minutes = Math.floor((diff % 3600000) / 60000);
+    var seconds = Math.floor((diff % 60000) / 1000);
+    timerEl.textContent = 
+      String(hours).padStart(2, '0') + ':' + 
+      String(minutes).padStart(2, '0') + ':' + 
+      String(seconds).padStart(2, '0');
   }
+  setInterval(updateCountdown, 1000);
+  updateCountdown();
 
-  const hours = Math.floor(diff / 3600000);
-  const minutes = Math.floor((diff % 3600000) / 60000);
-  const seconds = Math.floor((diff % 60000) / 1000);
-  timerEl.textContent = 
-    String(hours).padStart(2, '0') + ':' + 
-    String(minutes).padStart(2, '0') + ':' + 
-    String(seconds).padStart(2, '0');
-}
-setInterval(updateCountdown, 1000);
-updateCountdown();
+  // ===== LIVE CLOCK =====
+  function updateClock() {
+    var now = new Date();
+    var el = document.getElementById('live-clock');
+    if (el) el.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
 
-// ===== LIVE CLOCK =====
-function updateClock() {
-  const now = new Date();
-  const el = document.getElementById('live-clock');
-  if (el) el.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-}
-setInterval(updateClock, 1000);
-updateClock();
+  // ===== TAB NAVIGATION =====
+  function showTab(tabName) {
+    // Hide all content
+    document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.add('hidden'); });
+    // Show selected
+    var selected = document.getElementById('tab-content-' + tabName);
+    if (selected) selected.classList.remove('hidden');
 
-// ===== TAB NAVIGATION =====
-function showTab(tabName) {
-  // Hide all content
-  document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.add('hidden'); });
-  // Show selected
-  const selected = document.getElementById('tab-content-' + tabName);
-  if (selected) selected.classList.remove('hidden');
+    // Update top tabs
+    document.querySelectorAll('.top-tab').forEach(function(btn) {
+      btn.classList.remove('tab-active', 'text-white');
+      btn.classList.add('text-slate-400');
+    });
+    var topBtn = document.querySelector('.top-tab[data-tab="' + tabName + '"]');
+    if (topBtn) { topBtn.classList.add('tab-active', 'text-white'); topBtn.classList.remove('text-slate-400'); }
 
-  // Update top tabs
+    // Update bottom tabs
+    document.querySelectorAll('.bottom-tab').forEach(function(btn) {
+      btn.classList.remove('text-sky-400');
+      btn.classList.add('text-slate-400');
+    });
+    var bottomBtn = document.querySelector('.bottom-tab[data-tab="' + tabName + '"]');
+    if (bottomBtn) { bottomBtn.classList.add('text-sky-400'); bottomBtn.classList.remove('text-slate-400'); }
+
+    // Init map if needed
+    if (tabName === 'map' && !window.mapInitialized) { setTimeout(initMap, 100); }
+  }
+  window.showTab = showTab;
+
+  // Top tab click handlers
   document.querySelectorAll('.top-tab').forEach(function(btn) {
-    btn.classList.remove('tab-active', 'text-white');
-    btn.classList.add('text-slate-400');
+    btn.addEventListener('click', function() { showTab(this.getAttribute('data-tab')); });
   });
-  const topBtn = document.querySelector('.top-tab[data-tab="' + tabName + '"]');
-  if (topBtn) { topBtn.classList.add('tab-active', 'text-white'); topBtn.classList.remove('text-slate-400'); }
 
-  // Update bottom tabs
+  // Bottom tab click handlers
   document.querySelectorAll('.bottom-tab').forEach(function(btn) {
-    btn.classList.remove('text-sky-400');
-    btn.classList.add('text-slate-400');
+    btn.addEventListener('click', function() { showTab(this.getAttribute('data-tab')); });
   });
-  const bottomBtn = document.querySelector('.bottom-tab[data-tab="' + tabName + '"]');
-  if (bottomBtn) { bottomBtn.classList.add('text-sky-400'); bottomBtn.classList.remove('text-slate-400'); }
 
-  // Init map if needed
-  if (tabName === 'map' && !window.mapInitialized) { setTimeout(initMap, 100); }
-}
-
-// Top tab click handlers
-document.querySelectorAll('.top-tab').forEach(function(btn) {
-  btn.addEventListener('click', function() { showTab(this.getAttribute('data-tab')); });
-});
-
-// Bottom tab click handlers
-document.querySelectorAll('.bottom-tab').forEach(function(btn) {
-  btn.addEventListener('click', function() { showTab(this.getAttribute('data-tab')); });
-});
-
-// ===== COLLAPSIBLE SECTIONS =====
-document.querySelectorAll('.toggle-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    const targetId = this.getAttribute('data-target');
-    const target = document.getElementById(targetId);
-    if (target) {
-      target.classList.toggle('open');
-      const arrow = this.querySelector('.arrow');
-      if (arrow) arrow.textContent = target.classList.contains('open') ? '▲' : '▼';
-    }
+  // ===== COLLAPSIBLE SECTIONS =====
+  document.querySelectorAll('.toggle-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var targetId = this.getAttribute('data-target');
+      var target = document.getElementById(targetId);
+      if (target) {
+        target.classList.toggle('open');
+        var arrow = this.querySelector('.arrow');
+        if (arrow) arrow.textContent = target.classList.contains('open') ? '▲' : '▼';
+      }
+    });
   });
-});
 
-// ===== CHECK-IN SYSTEM =====
-const checkIns = JSON.parse(localStorage.getItem('nagasaki-checkins') || '{}');
-function updateCheckInButtons() {
-  Object.keys(checkIns).forEach(function(key) {
-    const btn = document.querySelector('button[data-checkin="' + key + '"]');
-    if (btn) {
-      btn.classList.remove('bg-slate-700', 'text-slate-400');
-      btn.classList.add('check-in-btn', 'text-white');
-      btn.innerHTML = '<span>✅</span> Checked In: ' + checkIns[key];
-    }
+  // ===== CHECK-IN SYSTEM =====
+  var checkIns = JSON.parse(localStorage.getItem('nagasaki-checkins') || '{}');
+  function updateCheckInButtons() {
+    Object.keys(checkIns).forEach(function(key) {
+      var btn = document.querySelector('button[data-checkin="' + key + '"]');
+      if (btn) {
+        btn.classList.remove('bg-slate-700', 'text-slate-400');
+        btn.classList.add('check-in-btn', 'text-white');
+        btn.innerHTML = '<span>✅</span> Checked In: ' + checkIns[key];
+      }
+    });
+  }
+  document.querySelectorAll('button[data-checkin]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var location = this.getAttribute('data-checkin');
+      var now = new Date();
+      var timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      checkIns[location] = timeStr;
+      localStorage.setItem('nagasaki-checkins', JSON.stringify(checkIns));
+      this.classList.remove('bg-slate-700', 'text-slate-400');
+      this.classList.add('check-in-btn', 'text-white');
+      this.innerHTML = '<span class="pulse-dot">✅</span> Checked In: ' + timeStr;
+    });
   });
-}
-document.querySelectorAll('button[data-checkin]').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    const location = this.getAttribute('data-checkin');
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    checkIns[location] = timeStr;
-    localStorage.setItem('nagasaki-checkins', JSON.stringify(checkIns));
-    this.classList.remove('bg-slate-700', 'text-slate-400');
-    this.classList.add('check-in-btn', 'text-white');
-    this.innerHTML = '<span class="pulse-dot">✅</span> Checked In: ' + timeStr;
+  updateCheckInButtons();
+
+  // ===== STRAVA MODAL =====
+  function toggleStrava() {
+    var modal = document.getElementById('strava-modal');
+    if (modal) modal.classList.toggle('hidden');
+  }
+  window.toggleStrava = toggleStrava;
+  var stravaBtn = document.getElementById('strava-connect');
+  if (stravaBtn) stravaBtn.addEventListener('click', toggleStrava);
+  document.querySelectorAll('#strava-modal .modal-close, #strava-modal .modal-backdrop').forEach(function(el) {
+    el.addEventListener('click', toggleStrava);
   });
-});
-updateCheckInButtons();
 
-// ===== STRAVA MODAL =====
-function toggleStrava() {
-  const modal = document.getElementById('strava-modal');
-  if (modal) modal.classList.toggle('hidden');
-}
-document.getElementById('strava-connect').addEventListener('click', toggleStrava);
-document.querySelectorAll('#strava-modal .modal-close, #strava-modal .modal-backdrop').forEach(function(el) {
-  el.addEventListener('click', toggleStrava);
-});
+  // ===== ROUTE DETAIL MODAL =====
+  var routeDetails = {
+    megami: { title: 'Megami Bridge Loop', content: '<div class="space-y-2"><p><b>Distance:</b> 15km</p><p><b>Elevation:</b> 50m</p><p><b>Difficulty:</b> Easy (Casual-friendly)</p><p><b>Duration:</b> ~45 minutes</p><p><b>Start:</b> Nagasaki Station area</p><p><b>Highlights:</b> Flat, protected bike lanes, iconic 1.3km cable-stayed bridge over Nagasaki Harbor.</p><p><b>Post-ride:</b> Ark Land Spa (Iojima) — free shuttle from Nagasaki Station</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The Megami Bridge (女神大橋) opened in 1991 and is one of Nagasaki's most recognizable landmarks. The name means "Goddess Bridge."</p></div></div>' },
+    omura: { title: 'Omura Bay Green Route', content: '<div class="space-y-2"><p><b>Distance:</b> 25km</p><p><b>Elevation:</b> 200m</p><p><b>Difficulty:</b> Easy</p><p><b>Duration:</b> ~1.5 hours</p><p><b>Highlights:</b> Virtually traffic-free, tea plantations, coastal views of Omura Bay.</p><p><b>Post-ride:</b> Kidoan onsen — rustic Swiss-style chalet by the sea</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 Omura Bay is known for its pearl cultivation and the "99 Islands" (Kujukushima) are actually part of this bay area.</p></div></div>' },
+    nomo: { title: 'Nomo Peninsula Coastal', content: '<div class="space-y-2"><p><b>Distance:</b> 30km</p><p><b>Elevation:</b> 150m</p><p><b>Difficulty:</b> Easy</p><p><b>Duration:</b> ~1.5 hours</p><p><b>Highlights:</b> Quiet fishing villages, sea breeze, champon noodle stops.</p><p><b>Post-ride:</b> Local seafood + hotel bath</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 Cape Nomo (野母崎) is the southernmost point of the Nomo Peninsula. Famous for spiny lobster and fresh seafood.</p></div></div>' },
+    inasa: { title: 'Mount Inasa Climb', content: '<div class="space-y-2"><p><b>Distance:</b> 7km</p><p><b>Elevation:</b> 300m</p><p><b>Difficulty:</b> Hard (Serious)</p><p><b>Duration:</b> ~45 minutes</p><p><b>Gradient:</b> Average 4-5%, max 8%</p><p><b>Reward:</b> One of Japan's Top 3 Night Views — "10 Million Dollar View"</p><p><b>Post-ride:</b> Hotel bath + night view at summit restaurant ITADAKI</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The climb is described as "perfectly smooth" with consistent gradient. Best done before sunset to enjoy the night view at the top!</p></div></div>' },
+    shimabara: { title: 'Shimabara Peninsula Circuit', content: '<div class="space-y-2"><p><b>Distance:</b> 50km</p><p><b>Elevation:</b> 800m</p><p><b>Difficulty:</b> Moderate</p><p><b>Duration:</b> ~3 hours</p><p><b>Style:</b> Car + Bike hybrid — drive to Shimabara, cycle the loop</p><p><b>Highlights:</b> Abandoned railway tracks, Unzen volcano views, geopark.</p><p><b>Post-ride:</b> Unzen Onsen — sulfur baths</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The Shimabara Peninsula has over 6 million years of volcanic history. The abandoned railway tracks offer unique cycling paths.</p></div></div>' },
+    unzen: { title: 'Nagasaki → Unzen Onsen', content: '<div class="space-y-2"><p><b>Distance:</b> 60km</p><p><b>Elevation:</b> 1,200m</p><p><b>Difficulty:</b> Very Hard (Epic)</p><p><b>Duration:</b> ~4 hours</p><p><b>Reward:</b> Hot springs at 700m altitude + "Unzen Hell" geothermal area</p><p><b>Post-ride:</b> Onsen tamago (hot spring eggs) + sulfur bath</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The ultimate Nagasaki cycling challenge. Starts with punchy urban climbs, transitions to scenic mountain roads, and ends at Japan's first national park. Yunosato Public Bath (¥200) is a 100+ year old local favorite.</p></div></div>' }
+  };
 
-// ===== ROUTE DETAIL MODAL =====
-const routeDetails = {
-  megami: { title: 'Megami Bridge Loop', content: '<div class="space-y-2"><p><b>Distance:</b> 15km</p><p><b>Elevation:</b> 50m</p><p><b>Difficulty:</b> Easy (Casual-friendly)</p><p><b>Duration:</b> ~45 minutes</p><p><b>Start:</b> Nagasaki Station area</p><p><b>Highlights:</b> Flat, protected bike lanes, iconic 1.3km cable-stayed bridge over Nagasaki Harbor.</p><p><b>Post-ride:</b> Ark Land Spa (Iojima) — free shuttle from Nagasaki Station</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The Megami Bridge (女神大橋) opened in 1991 and is one of Nagasaki's most recognizable landmarks. The name means "Goddess Bridge."</p></div></div>' },
-  omura: { title: 'Omura Bay Green Route', content: '<div class="space-y-2"><p><b>Distance:</b> 25km</p><p><b>Elevation:</b> 200m</p><p><b>Difficulty:</b> Easy</p><p><b>Duration:</b> ~1.5 hours</p><p><b>Highlights:</b> Virtually traffic-free, tea plantations, coastal views of Omura Bay.</p><p><b>Post-ride:</b> Kidoan onsen — rustic Swiss-style chalet by the sea</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 Omura Bay is known for its pearl cultivation and the "99 Islands" (Kujukushima) are actually part of this bay area.</p></div></div>' },
-  nomo: { title: 'Nomo Peninsula Coastal', content: '<div class="space-y-2"><p><b>Distance:</b> 30km</p><p><b>Elevation:</b> 150m</p><p><b>Difficulty:</b> Easy</p><p><b>Duration:</b> ~1.5 hours</p><p><b>Highlights:</b> Quiet fishing villages, sea breeze, champon noodle stops.</p><p><b>Post-ride:</b> Local seafood + hotel bath</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 Cape Nomo (野母崎) is the southernmost point of the Nomo Peninsula. Famous for spiny lobster and fresh seafood.</p></div></div>' },
-  inasa: { title: 'Mount Inasa Climb', content: '<div class="space-y-2"><p><b>Distance:</b> 7km</p><p><b>Elevation:</b> 300m</p><p><b>Difficulty:</b> Hard (Serious)</p><p><b>Duration:</b> ~45 minutes</p><p><b>Gradient:</b> Average 4-5%, max 8%</p><p><b>Reward:</b> One of Japan's Top 3 Night Views — "10 Million Dollar View"</p><p><b>Post-ride:</b> Hotel bath + night view at summit restaurant ITADAKI</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The climb is described as "perfectly smooth" with consistent gradient. Best done before sunset to enjoy the night view at the top!</p></div></div>' },
-  shimabara: { title: 'Shimabara Peninsula Circuit', content: '<div class="space-y-2"><p><b>Distance:</b> 50km</p><p><b>Elevation:</b> 800m</p><p><b>Difficulty:</b> Moderate</p><p><b>Duration:</b> ~3 hours</p><p><b>Style:</b> Car + Bike hybrid — drive to Shimabara, cycle the loop</p><p><b>Highlights:</b> Abandoned railway tracks, Unzen volcano views, geopark.</p><p><b>Post-ride:</b> Unzen Onsen — sulfur baths</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The Shimabara Peninsula has over 6 million years of volcanic history. The abandoned railway tracks offer unique cycling paths.</p></div></div>' },
-  unzen: { title: 'Nagasaki → Unzen Onsen', content: '<div class="space-y-2"><p><b>Distance:</b> 60km</p><p><b>Elevation:</b> 1,200m</p><p><b>Difficulty:</b> Very Hard (Epic)</p><p><b>Duration:</b> ~4 hours</p><p><b>Reward:</b> Hot springs at 700m altitude + "Unzen Hell" geothermal area</p><p><b>Post-ride:</b> Onsen tamago (hot spring eggs) + sulfur bath</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The ultimate Nagasaki cycling challenge. Starts with punchy urban climbs, transitions to scenic mountain roads, and ends at Japan's first national park. Yunosato Public Bath (¥200) is a 100+ year old local favorite.</p></div></div>' }
-};
+  function showRouteDetail(routeId) {
+    var detail = routeDetails[routeId];
+    if (!detail) return;
+    var titleEl = document.getElementById('route-modal-title');
+    var contentEl = document.getElementById('route-modal-content');
+    var modal = document.getElementById('route-modal');
+    if (titleEl) titleEl.textContent = detail.title;
+    if (contentEl) contentEl.innerHTML = detail.content;
+    if (modal) modal.classList.remove('hidden');
+  }
+  window.showRouteDetail = showRouteDetail;
+  function closeRouteDetail() { 
+    var modal = document.getElementById('route-modal');
+    if (modal) modal.classList.add('hidden'); 
+  }
+  window.closeRouteDetail = closeRouteDetail;
 
-function showRouteDetail(routeId) {
-  const detail = routeDetails[routeId];
-  if (!detail) return;
-  document.getElementById('route-modal-title').textContent = detail.title;
-  document.getElementById('route-modal-content').innerHTML = detail.content;
-  document.getElementById('route-modal').classList.remove('hidden');
-}
-function closeRouteDetail() { document.getElementById('route-modal').classList.add('hidden'); }
-
-document.querySelectorAll('.route-card').forEach(function(card) {
-  card.addEventListener('click', function() { showRouteDetail(this.getAttribute('data-route')); });
-});
-document.querySelectorAll('#route-modal .modal-close, #route-modal .modal-backdrop').forEach(function(el) {
-  el.addEventListener('click', closeRouteDetail);
-});
-
-// ===== MAP =====
-let map;
-let mapInitialized = false;
-function initMap() {
-  if (mapInitialized || typeof L === 'undefined') return;
-  map = L.map('map').setView([32.7447, 129.8736], 11);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
-  const markers = [
-    { pos: [34.6913, 135.1830], title: 'Kobe Rokko Port', color: '#f59e0b', icon: '🚢' },
-    { pos: [33.2333, 131.6067], title: 'Oita Port', color: '#f59e0b', icon: '🚢' },
-    { pos: [33.2667, 129.8833], title: 'Imari', color: '#10b981', icon: '🏺' },
-    { pos: [32.7447, 129.8736], title: 'THE GLOBAL VIEW Nagasaki', color: '#3b82f6', icon: '🏨' },
-    { pos: [32.7527, 129.8495], title: 'Mount Inasa', color: '#f97316', icon: '🌃' },
-    { pos: [32.7344, 129.8694], title: 'Shianbashi', color: '#ec4899', icon: '🍸' },
-    { pos: [32.7333, 129.8667], title: 'Nagasaki Chinatown', color: '#ef4444', icon: '🏮' },
-    { pos: [32.7350, 130.2000], title: 'Obama Onsen', color: '#8b5cf6', icon: '♨️' },
-    { pos: [32.7333, 130.2667], title: 'Unzen Onsen', color: '#ec4899', icon: '♨️' },
-    { pos: [33.1833, 129.7167], title: 'Sasebo / Kujukushima', color: '#06b6d4', icon: '🏝️' }
-  ];
-  markers.forEach(function(m) {
-    const customIcon = L.divIcon({ className: 'custom-marker', html: '<div style="background:' + m.color + ';width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.5);">' + m.icon + '</div>', iconSize: [32, 32], iconAnchor: [16, 16] });
-    L.marker(m.pos, { icon: customIcon }).addTo(map).bindPopup(m.title);
+  document.querySelectorAll('.route-card').forEach(function(card) {
+    card.addEventListener('click', function() { showRouteDetail(this.getAttribute('data-route')); });
   });
-  mapInitialized = true;
-}
-
-// Map filter buttons
-document.querySelectorAll('.map-filter').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    console.log('Map filter:', this.getAttribute('data-filter'));
+  document.querySelectorAll('#route-modal .modal-close, #route-modal .modal-backdrop').forEach(function(el) {
+    el.addEventListener('click', closeRouteDetail);
   });
-});
 
-// Auto night mode
-const hour = new Date().getHours();
-if (hour >= 18 || hour < 6) { document.body.classList.add('night-mode'); }
+  // ===== MAP =====
+  window.mapInitialized = false;
+  function initMap() {
+    if (window.mapInitialized || typeof L === 'undefined') return;
+    var map = L.map('map').setView([32.7447, 129.8736], 11);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+    var markers = [
+      { pos: [34.6913, 135.1830], title: 'Kobe Rokko Port', color: '#f59e0b', icon: '🚢' },
+      { pos: [33.2333, 131.6067], title: 'Oita Port', color: '#f59e0b', icon: '🚢' },
+      { pos: [33.2667, 129.8833], title: 'Imari', color: '#10b981', icon: '🏺' },
+      { pos: [32.7447, 129.8736], title: 'THE GLOBAL VIEW Nagasaki', color: '#3b82f6', icon: '🏨' },
+      { pos: [32.7527, 129.8495], title: 'Mount Inasa', color: '#f97316', icon: '🌃' },
+      { pos: [32.7344, 129.8694], title: 'Shianbashi', color: '#ec4899', icon: '🍸' },
+      { pos: [32.7333, 129.8667], title: 'Nagasaki Chinatown', color: '#ef4444', icon: '🏮' },
+      { pos: [32.7350, 130.2000], title: 'Obama Onsen', color: '#8b5cf6', icon: '♨️' },
+      { pos: [32.7333, 130.2667], title: 'Unzen Onsen', color: '#ec4899', icon: '♨️' },
+      { pos: [33.1833, 129.7167], title: 'Sasebo / Kujukushima', color: '#06b6d4', icon: '🏝️' }
+    ];
+    markers.forEach(function(m) {
+      var customIcon = L.divIcon({ className: 'custom-marker', html: '<div style="background:' + m.color + ';width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.5);">' + m.icon + '</div>', iconSize: [32, 32], iconAnchor: [16, 16] });
+      L.marker(m.pos, { icon: customIcon }).addTo(map).bindPopup(m.title);
+    });
+    window.mapInitialized = true;
+  }
+  window.initMap = initMap;
+
+  // Map filter buttons
+  document.querySelectorAll('.map-filter').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      console.log('Map filter:', this.getAttribute('data-filter'));
+    });
+  });
+
+  // Auto night mode
+  var hour = new Date().getHours();
+  if (hour >= 18 || hour < 6) { document.body.classList.add('night-mode'); }
+
+  console.log('ALL EVENT LISTENERS ATTACHED');
+});
 </script>
 
 </body>
