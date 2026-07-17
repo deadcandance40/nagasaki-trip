@@ -7,43 +7,41 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Nagasaki Cycle & Trip Planner</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-:root { --sea: #0ea5e9; --dark: #0f172a; }
-* { -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-.glass { background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
-.gradient-sea { background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%); }
-.gradient-hero { background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); }
-.route-card { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-.route-card:active { transform: scale(0.97); }
-.tab-active { position: relative; }
-.tab-active::after { content: ''; position: absolute; bottom: -2px; left: 20%; width: 60%; height: 3px; background: var(--sea); border-radius: 2px; }
-.pulse-dot { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
-.elevation-bar { transition: height 0.6s ease-out; }
-.hide-scrollbar::-webkit-scrollbar { display: none; }
-.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-.wiki-link { color: #38bdf8; text-decoration: none; border-bottom: 1px dotted #38bdf8; }
-.wiki-link:hover { border-bottom: 1px solid #38bdf8; }
-#map { height: 300px; border-radius: 16px; z-index: 1; }
-.strava-btn { background: linear-gradient(90deg, #fc4c02, #ff6b35); }
-.check-in-btn { background: linear-gradient(135deg, #10b981, #059669); }
-.floating-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; padding-bottom: env(safe-area-inset-bottom); }
-.section-enter { animation: slideUp 0.4s ease-out; }
-@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.ferry-status { background: linear-gradient(90deg, #f59e0b, #d97706); }
-.hotel-card { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); }
-.onsen-card { border-left: 4px solid #f97316; }
-.restaurant-card { border-left: 4px solid #10b981; }
-.bar-card { border-left: 4px solid #ec4899; }
-.collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-.collapsible-content.open { max-height: 2000px; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:'Inter',sans-serif; background:#0f172a; color:#f8fafc; overflow-x:hidden; -webkit-font-smoothing:antialiased; min-height:100vh; padding-bottom:80px; }
+.glass { background:rgba(30,41,59,0.9); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.08); }
+.gradient-sea { background:linear-gradient(135deg,#0ea5e9,#06b6d4); }
+.gradient-hero { background:linear-gradient(180deg,#0f172a,#1e293b,#0f172a); }
+.tab-active { color:#0ea5e9 !important; position:relative; }
+.tab-active::after { content:''; position:absolute; bottom:-2px; left:20%; width:60%; height:3px; background:#0ea5e9; border-radius:2px; }
+.pulse-dot { animation:pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; display:inline-block; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.2)} }
+.elevation-bar { transition:height 0.6s ease-out; }
+.hide-scrollbar::-webkit-scrollbar { display:none; }
+.hide-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+.wiki-link { color:#38bdf8; text-decoration:none; border-bottom:1px dotted #38bdf8; }
+#map { height:300px; border-radius:16px; }
+.strava-btn { background:linear-gradient(90deg,#fc4c02,#ff6b35); }
+.check-in-btn { background:linear-gradient(135deg,#10b981,#059669); }
+.floating-nav { position:fixed; bottom:0; left:0; right:0; z-index:50; padding-bottom:env(safe-area-inset-bottom); }
+.collapsible { max-height:0; overflow:hidden; transition:max-height 0.3s ease-out; }
+.collapsible.open { max-height:2000px; }
+.hotel-card { background:linear-gradient(135deg,#1e293b,#334155); }
+.onsen-card { border-left:4px solid #f97316; }
+.restaurant-card { border-left:4px solid #10b981; }
+.bar-card { border-left:4px solid #ec4899; }
+.preboard-card { background:linear-gradient(135deg,#f59e0b,#d97706); }
+.countdown-box { background:rgba(0,0,0,0.3); border-radius:12px; padding:12px; text-align:center; }
+.countdown-number { font-size:2.5rem; font-weight:800; font-variant-numeric:tabular-nums; }
+.route-card { cursor:pointer; transition:transform 0.2s; }
+.route-card:active { transform:scale(0.98); }
+.btn { cursor:pointer; transition:opacity 0.2s; }
+.btn:active { opacity:0.7; }
 </style>
 </head>
-<body class="gradient-hero min-h-screen pb-24">
+<body class="gradient-hero">
+
 <header class="sticky top-0 z-40 glass px-4 py-3">
   <div class="flex items-center justify-between max-w-lg mx-auto">
     <div class="flex items-center gap-2">
@@ -51,8 +49,8 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
       <div><h1 class="text-sm font-bold text-white leading-tight">Nagasaki Cycle</h1><p class="text-xs text-slate-400">Trip Planner</p></div>
     </div>
     <div class="flex items-center gap-2">
-      <span id="live-clock" class="text-xs font-mono text-slate-400">15:51</span>
-      <button onclick="toggleStrava()" class="strava-btn text-white text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1">
+      <span id="live-clock" class="text-xs font-mono text-slate-400">--:--</span>
+      <button id="strava-connect" class="strava-btn btn text-white text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1 border-0">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.539 0 4.223 12.343h4.172"/></svg>
         Connect
       </button>
@@ -60,11 +58,30 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
   </div>
 </header>
 
-<section class="px-4 pt-6 pb-4 max-w-lg mx-auto">
-  <div class="glass rounded-2xl p-4 mb-4">
-    <div class="flex items-center justify-between mb-3">
+<section class="px-4 pt-4 pb-2 max-w-lg mx-auto">
+  <!-- PRE-BOARDING COUNTDOWN -->
+  <div id="preboard-section" class="preboard-card rounded-2xl p-4 mb-4 text-white">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xs font-bold uppercase tracking-wider">🚢 PRE-BOARDING</span>
+      <span id="preboard-status" class="text-xs font-bold px-2 py-0.5 rounded-full bg-white/20">COUNTING DOWN</span>
+    </div>
+    <div class="countdown-box mb-2">
+      <div class="text-xs text-white/70 mb-1">Boarding starts at 18:50</div>
+      <div id="countdown-timer" class="countdown-number">--:--:--</div>
+      <div class="text-xs text-white/70 mt-1">until pre-boarding</div>
+    </div>
+    <div class="flex items-center justify-between text-xs">
+      <span>🎫 Res: 16208</span>
+      <span>🔑 Key: 728</span>
+      <span>👥 2 pax + 1 car</span>
+    </div>
+  </div>
+
+  <!-- FERRY DEPARTURE -->
+  <div class="glass rounded-2xl p-4 mb-3">
+    <div class="flex items-center justify-between mb-2">
       <span class="text-xs font-semibold text-amber-400 uppercase tracking-wider">🚢 Tonight</span>
-      <span class="ferry-status text-white text-xs font-bold px-2 py-0.5 rounded-full">BOARDING SOON</span>
+      <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500 text-white">BOARDING AT 18:50</span>
     </div>
     <div class="flex items-center gap-3 mb-2">
       <div class="text-3xl font-bold text-white">19:50</div>
@@ -76,12 +93,9 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
       <span class="text-slate-500">SUNFLOWER PEARL</span>
       <span class="text-slate-300">Oita</span>
     </div>
-    <div class="mt-3 pt-3 border-t border-slate-700/50 flex items-center justify-between text-xs text-slate-400">
-      <span>🎫 Res: 16208</span>
-      <span>🔑 Key: 728</span>
-      <span>👥 2 pax + 1 car</span>
-    </div>
   </div>
+
+  <!-- RETURN FERRY -->
   <div class="glass rounded-2xl p-4 opacity-70">
     <div class="flex items-center justify-between mb-2">
       <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">🚢 Return · July 20</span>
@@ -96,19 +110,22 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
   </div>
 </section>
 
+<!-- TOP NAV TABS -->
 <nav class="sticky top-14 z-30 glass border-b border-slate-700/30 px-2 py-2">
   <div class="flex overflow-x-auto hide-scrollbar gap-1 max-w-lg mx-auto">
-    <button onclick="showTab('timeline')" id="tab-timeline" class="tab-active whitespace-nowrap px-4 py-2 text-sm font-semibold text-white rounded-lg">Timeline</button>
-    <button onclick="showTab('routes')" id="tab-routes" class="whitespace-nowrap px-4 py-2 text-sm font-medium text-slate-400 rounded-lg hover:text-white">Routes</button>
-    <button onclick="showTab('food')" id="tab-food" class="whitespace-nowrap px-4 py-2 text-sm font-medium text-slate-400 rounded-lg hover:text-white">Food</button>
-    <button onclick="showTab('onsen')" id="tab-onsen" class="whitespace-nowrap px-4 py-2 text-sm font-medium text-slate-400 rounded-lg hover:text-white">Onsen</button>
-    <button onclick="showTab('night')" id="tab-night" class="whitespace-nowrap px-4 py-2 text-sm font-medium text-slate-400 rounded-lg hover:text-white">Night</button>
-    <button onclick="showTab('map')" id="tab-map" class="whitespace-nowrap px-4 py-2 text-sm font-medium text-slate-400 rounded-lg hover:text-white">Map</button>
+    <button class="top-tab tab-active whitespace-nowrap px-4 py-2 text-sm font-semibold text-white rounded-lg btn border-0 bg-transparent" data-tab="timeline">Timeline</button>
+    <button class="top-tab whitespace-nowrap px-4 py-2 text-sm font-medium text-slate-400 rounded-lg btn border-0 bg-transparent" data-tab="routes">Routes</button>
+    <button class="top-tab whitespace-nowrap px-4 py-2 text-sm font-medium text-slate-400 rounded-lg btn border-0 bg-transparent" data-tab="food">Food</button>
+    <button class="top-tab whitespace-nowrap px-4 py-2 text-sm font-medium text-slate-400 rounded-lg btn border-0 bg-transparent" data-tab="onsen">Onsen</button>
+    <button class="top-tab whitespace-nowrap px-4 py-2 text-sm font-medium text-slate-400 rounded-lg btn border-0 bg-transparent" data-tab="night">Night</button>
+    <button class="top-tab whitespace-nowrap px-4 py-2 text-sm font-medium text-slate-400 rounded-lg btn border-0 bg-transparent" data-tab="map">Map</button>
   </div>
 </nav>
 
-<main class="px-4 pt-4 max-w-lg mx-auto space-y-4">
-<div id="content-timeline" class="section-enter">
+<main class="px-4 pt-4 max-w-lg mx-auto">
+
+<!-- TIMELINE -->
+<div id="tab-content-timeline" class="tab-content">
   <div class="hotel-card rounded-2xl p-4 mb-4">
     <div class="flex items-start justify-between mb-3">
       <div><h2 class="text-lg font-bold text-white">THE GLOBAL VIEW Nagasaki</h2><p class="text-sm text-slate-400">🏨 2 nights · Jul 18-20</p></div>
@@ -119,33 +136,29 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
       <span class="text-xs bg-orange-500/20 text-orange-300 px-2 py-1 rounded">🍽️ 15F Restaurant</span>
       <span class="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded">🎹 Lobby Piano</span>
     </div>
-    <button onclick="toggleCollapse('hotel-details')" class="text-xs text-sky-400 font-medium flex items-center gap-1">
-      <span>📍 2-26 Takara-machi, Nagasaki</span><span id="hotel-arrow">▼</span>
+    <button class="toggle-btn text-xs text-sky-400 font-medium flex items-center gap-1 btn border-0 bg-transparent" data-target="hotel-details">
+      <span>📍 2-26 Takara-machi, Nagasaki</span><span class="arrow">▼</span>
     </button>
-    <div id="hotel-details" class="collapsible-content mt-2">
+    <div id="hotel-details" class="collapsible mt-2">
       <div class="text-xs text-slate-400 space-y-1">
         <p>📞 <a href="tel:+81958231111" class="wiki-link">+81-95-823-1111</a></p>
         <p>🌐 <a href="https://www.rio-hotels.co.jp/nagasaki/" target="_blank" class="wiki-link">rio-hotels.co.jp/nagasaki</a></p>
         <p>🚶 2 min walk from Nagasaki Station</p>
         <p>🚃 Takaramachi tram stop nearby</p>
-        <p class="pt-1 text-slate-500">Built 1989. Part of RIO Hotels group. Best Rate Guarantee.</p>
       </div>
     </div>
   </div>
 
   <div class="space-y-3">
     <div class="glass rounded-2xl p-4 border-l-4 border-amber-500">
-      <div class="flex items-center justify-between mb-2">
-        <h3 class="font-bold text-white">Fri, July 18</h3>
-        <span class="text-xs bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full">Arrival Day</span>
-      </div>
+      <div class="flex items-center justify-between mb-2"><h3 class="font-bold text-white">Fri, July 18</h3><span class="text-xs bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full">Arrival Day</span></div>
       <div class="space-y-2 text-sm">
         <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">07:20</span><div><p class="text-white">🚢 Arrive Oita Port</p><p class="text-xs text-slate-400">SUNFLOWER PEARL · Disembark with vehicle</p></div></div>
-        <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">09:00</span><div><p class="text-white">🚗 Drive Oita → Imari</p><p class="text-xs text-slate-400">~2 hours · 130km · Via Yaba-kei scenic route</p><button onclick="toggleCollapse('day1-drive')" class="text-xs text-sky-400 mt-1">💡 Fun facts ▼</button><div id="day1-drive" class="collapsible-content"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1"><p>🌿 <b>Yaba-kei</b> is one of the <a href="https://en.wikipedia.org/wiki/Three_Views_of_Japan" target="_blank" class="wiki-link">New Three Views of Japan</a> — a stunning valley in Oita Prefecture!</p><p>🏔️ The name means "Valley of the Eight Horses" — legend says 8 horses were once kept here.</p><p>🍁 Best known for autumn foliage and the Ao-no-Domon tunnel carved by hand.</p></div></div></div></div>
-        <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">12:00</span><div><p class="text-white">🏺 Imari Porcelain Village</p><p class="text-xs text-slate-400">Okawachiyama · "Village of Secret Kilns"</p><button onclick="toggleCollapse('imari-facts')" class="text-xs text-sky-400 mt-1">💡 Fun facts ▼</button><div id="imari-facts" class="collapsible-content"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1"><p>🏺 <b>Imari ware</b> was first produced in 1616 when Korean potter <b>Yi Sam-pyeong</b> discovered kaolin in Arita.</p><p>🇳🇱 Exported to Europe via the <a href="https://en.wikipedia.org/wiki/Dejima" target="_blank" class="wiki-link">Dutch East India Company</a> at Dejima.</p><p>👑 The <b>Nabeshima Clan</b> directly controlled production, building the village in secret to protect the technology!</p><p>🎨 Three main styles: <b>Ko-Imari</b> (blue & white), <b>Kakiemon</b> (colorful), and <b>Nabeshima</b> (red & blue).</p><p>🌍 European kilns like <b>Meissen</b> and <b>Royal Crown Derby</b> later copied Imari designs.</p></div></div></div></div>
+        <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">09:00</span><div><p class="text-white">🚗 Drive Oita → Imari</p><p class="text-xs text-slate-400">~2 hours · 130km · Via Yaba-kei scenic route</p><button class="toggle-btn text-xs text-sky-400 mt-1 btn border-0 bg-transparent" data-target="day1-drive">💡 Fun facts ▼</button><div id="day1-drive" class="collapsible"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1"><p>🌿 <b>Yaba-kei</b> is one of the <a href="https://en.wikipedia.org/wiki/Three_Views_of_Japan" target="_blank" class="wiki-link">New Three Views of Japan</a></p><p>🏔️ The name means "Valley of the Eight Horses"</p><p>🍁 Best known for autumn foliage and the Ao-no-Domon tunnel</p></div></div></div></div>
+        <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">12:00</span><div><p class="text-white">🏺 Imari Porcelain Village</p><p class="text-xs text-slate-400">Okawachiyama · "Village of Secret Kilns"</p><button class="toggle-btn text-xs text-sky-400 mt-1 btn border-0 bg-transparent" data-target="imari-facts">💡 Fun facts ▼</button><div id="imari-facts" class="collapsible"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1"><p>🏺 <b>Imari ware</b> was first produced in 1616 when Korean potter <b>Yi Sam-pyeong</b> discovered kaolin in Arita.</p><p>🇳🇱 Exported to Europe via the <a href="https://en.wikipedia.org/wiki/Dejima" target="_blank" class="wiki-link">Dutch East India Company</a> at Dejima.</p><p>👑 The <b>Nabeshima Clan</b> directly controlled production, building the village in secret!</p><p>🎨 Three main styles: <b>Ko-Imari</b> (blue & white), <b>Kakiemon</b> (colorful), and <b>Nabeshima</b> (red & blue).</p><p>🌍 European kilns like <b>Meissen</b> and <b>Royal Crown Derby</b> later copied Imari designs.</p></div></div></div></div>
         <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">14:00</span><div><p class="text-white">🚗 Drive Imari → Nagasaki</p><p class="text-xs text-slate-400">~1.5 hours · 90km</p></div></div>
         <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">15:00</span><div><p class="text-white">🏨 Check-in THE GLOBAL VIEW</p><p class="text-xs text-slate-400">Standard room (4) · 2 pax</p></div></div>
-        <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">19:00</span><div><p class="text-white">🌃 Mount Inasa Night View</p><p class="text-xs text-slate-400">One of Japan's Top 3 Night Views · "10 Million Dollar View"</p><button onclick="toggleCollapse('inasa-facts')" class="text-xs text-sky-400 mt-1">💡 Fun facts ▼</button><div id="inasa-facts" class="collapsible-content"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1"><p>🌃 Certified as one of the <a href="https://en.wikipedia.org/wiki/Mount_Inasa" target="_blank" class="wiki-link">"New Three Great Night Views of the World"</a> in 2012, alongside Monaco and Hong Kong.</p><p>🏔️ Elevation: 333m — reachable by ropeway (5 min, ¥1,900 round trip), bus, or car.</p><p>🚡 The ropeway lower station is just 5 min from Nagasaki Station by bus.</p><p>💡 The view is called the <b>"10 Million Dollar Night View"</b> (1000万ドルの夜景) — a must-see!</p><p>🍽️ Summit restaurant <b>ITADAKI</b> available for dinner with a view.</p></div></div></div></div>
+        <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">19:00</span><div><p class="text-white">🌃 Mount Inasa Night View</p><p class="text-xs text-slate-400">One of Japan's Top 3 Night Views</p><button class="toggle-btn text-xs text-sky-400 mt-1 btn border-0 bg-transparent" data-target="inasa-facts">💡 Fun facts ▼</button><div id="inasa-facts" class="collapsible"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1"><p>🌃 Certified as one of the <a href="https://en.wikipedia.org/wiki/Mount_Inasa" target="_blank" class="wiki-link">"New Three Great Night Views of the World"</a> in 2012, alongside Monaco and Hong Kong.</p><p>🏔️ Elevation: 333m — reachable by ropeway (5 min, ¥1,900 RT), bus, or car.</p><p>💡 Called the <b>"10 Million Dollar Night View"</b> (1000万ドルの夜景) — a must-see!</p><p>🍽️ Summit restaurant <b>ITADAKI</b> available for dinner with a view.</p></div></div></div></div>
       </div>
     </div>
 
@@ -153,7 +166,7 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
       <div class="flex items-center justify-between mb-2"><h3 class="font-bold text-white">Sat, July 19</h3><span class="text-xs bg-sky-500/20 text-sky-300 px-2 py-0.5 rounded-full">Cycling Day</span></div>
       <div class="space-y-2 text-sm">
         <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">08:00</span><div><p class="text-white">🚴 Morning Ride: Megami Bridge Loop</p><p class="text-xs text-slate-400">15km · Flat · Casual-friendly · Sea views</p></div></div>
-        <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">12:00</span><div><p class="text-white">🍜 Lunch: Nagasaki Champon</p><p class="text-xs text-slate-400">Shikairou (original recipe) or local shop</p><button onclick="toggleCollapse('champon-facts')" class="text-xs text-sky-400 mt-1">💡 Fun facts ▼</button><div id="champon-facts" class="collapsible-content"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1"><p>🍜 Created in the Meiji era by <b>Chan Ping Shun</b> at <b>Shikairou</b> restaurant to feed poor Chinese students.</p><p>🥢 Based on Fujian's "Tonniishimen" — the name "champon" means "mixture of various things."</p><p>🍳 Unlike ramen, champon uses thick noodles made with <b>touaku</b> (sodium carbonate), giving a unique chewy texture.</p><p>🏪 <b>Ringer Hut</b> (founded 1974) made it famous nationwide with 600+ stores.</p><p>🍰 Pair with <b>Castella</b> — Nagasaki's Portuguese sponge cake brought by missionaries in the 16th century!</p></div></div></div></div>
+        <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">12:00</span><div><p class="text-white">🍜 Lunch: Nagasaki Champon</p><p class="text-xs text-slate-400">Shikairou (original recipe) or local shop</p><button class="toggle-btn text-xs text-sky-400 mt-1 btn border-0 bg-transparent" data-target="champon-facts">💡 Fun facts ▼</button><div id="champon-facts" class="collapsible"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1"><p>🍜 Created in the Meiji era by <b>Chan Ping Shun</b> at <b>Shikairou</b> restaurant to feed poor Chinese students.</p><p>🥢 Based on Fujian's "Tonniishimen" — the name "champon" means "mixture of various things."</p><p>🍳 Unlike ramen, champon uses thick noodles made with <b>touaku</b> (sodium carbonate), giving a unique chewy texture.</p><p>🏪 <b>Ringer Hut</b> (founded 1974) made it famous nationwide with 600+ stores.</p><p>🍰 Pair with <b>Castella</b> — Nagasaki's Portuguese sponge cake brought by missionaries in the 16th century!</p></div></div></div></div>
         <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">14:00</span><div><p class="text-white">🚴 Afternoon: Serious Climb — Mount Inasa</p><p class="text-xs text-slate-400">7km · 300m elevation · "Perfectly smooth ascent"</p></div></div>
         <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">18:00</span><div><p class="text-white">♨️ Recovery: Hotel Bath or Obama Onsen</p><p class="text-xs text-slate-400">105°C source temp · Japan's hottest spring</p></div></div>
         <div class="flex items-start gap-2"><span class="text-slate-500 font-mono text-xs mt-0.5">20:00</span><div><p class="text-white">🍻 Evening: Shianbashi Nightlife</p><p class="text-xs text-slate-400">Doza-machi · Hidden bars · Kaniya rice balls</p></div></div>
@@ -172,30 +185,31 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
   </div>
 
   <div class="grid grid-cols-2 gap-2 mt-4">
-    <button onclick="checkIn('ferry-depart')" id="btn-ferry-depart" class="check-in-btn text-white text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2"><span>✅</span> Check In: Depart Kobe</button>
-    <button onclick="checkIn('ferry-arrive')" id="btn-ferry-arrive" class="bg-slate-700 text-slate-400 text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2"><span>⏳</span> Check In: Arrive Oita</button>
-    <button onclick="checkIn('imari')" id="btn-imari" class="bg-slate-700 text-slate-400 text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2"><span>⏳</span> Check In: Imari</button>
-    <button onclick="checkIn('hotel')" id="btn-hotel" class="bg-slate-700 text-slate-400 text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2"><span>⏳</span> Check In: Hotel</button>
+    <button class="check-in-btn btn text-white text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2 border-0" data-checkin="ferry-depart"><span>✅</span> Check In: Depart Kobe</button>
+    <button class="bg-slate-700 btn text-slate-400 text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2 border-0" data-checkin="ferry-arrive"><span>⏳</span> Check In: Arrive Oita</button>
+    <button class="bg-slate-700 btn text-slate-400 text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2 border-0" data-checkin="imari"><span>⏳</span> Check In: Imari</button>
+    <button class="bg-slate-700 btn text-slate-400 text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2 border-0" data-checkin="hotel"><span>⏳</span> Check In: Hotel</button>
   </div>
 </div>
-<div id="content-routes" class="hidden section-enter">
-  <h2 class="text-xl font-bold text-white mb-4">🚴 Cycling Routes</h2>
 
+<!-- ROUTES -->
+<div id="tab-content-routes" class="tab-content hidden">
+  <h2 class="text-xl font-bold text-white mb-4">🚴 Cycling Routes</h2>
   <h3 class="text-sm font-semibold text-sky-400 uppercase tracking-wider mb-3">🌊 Sea Routes (Casual)</h3>
   <div class="space-y-3 mb-6">
-    <div class="route-card glass rounded-2xl p-4 border-l-4 border-sky-500" onclick="showRouteDetail('megami')">
+    <div class="route-card glass rounded-2xl p-4 border-l-4 border-sky-500" data-route="megami">
       <div class="flex items-center justify-between mb-2"><h4 class="font-bold text-white">Megami Bridge Loop</h4><span class="text-xs bg-green-500/20 text-green-300 px-2 py-0.5 rounded-full">Easy</span></div>
       <div class="flex items-center gap-4 text-sm text-slate-400 mb-2"><span>📏 15km</span><span>📈 50m</span><span>⏱️ ~45min</span></div>
       <p class="text-xs text-slate-400">Flat, protected bike lanes, iconic 1.3km cable-stayed bridge over Nagasaki Harbor.</p>
       <div class="mt-2 flex gap-2 flex-wrap"><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">🏖️ Coastal</span><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">🌉 Bridge</span></div>
     </div>
-    <div class="route-card glass rounded-2xl p-4 border-l-4 border-sky-500" onclick="showRouteDetail('omura')">
+    <div class="route-card glass rounded-2xl p-4 border-l-4 border-sky-500" data-route="omura">
       <div class="flex items-center justify-between mb-2"><h4 class="font-bold text-white">Omura Bay Green Route</h4><span class="text-xs bg-green-500/20 text-green-300 px-2 py-0.5 rounded-full">Easy</span></div>
       <div class="flex items-center gap-4 text-sm text-slate-400 mb-2"><span>📏 25km</span><span>📈 200m</span><span>⏱️ ~1.5hr</span></div>
       <p class="text-xs text-slate-400">Virtually traffic-free, tea plantations, coastal views. Perfect for a relaxed ride.</p>
       <div class="mt-2 flex gap-2 flex-wrap"><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">🍃 Nature</span><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">🚫 No traffic</span></div>
     </div>
-    <div class="route-card glass rounded-2xl p-4 border-l-4 border-sky-500" onclick="showRouteDetail('nomo')">
+    <div class="route-card glass rounded-2xl p-4 border-l-4 border-sky-500" data-route="nomo">
       <div class="flex items-center justify-between mb-2"><h4 class="font-bold text-white">Nomo Peninsula Coastal</h4><span class="text-xs bg-green-500/20 text-green-300 px-2 py-0.5 rounded-full">Easy</span></div>
       <div class="flex items-center gap-4 text-sm text-slate-400 mb-2"><span>📏 30km</span><span>📈 150m</span><span>⏱️ ~1.5hr</span></div>
       <p class="text-xs text-slate-400">Quiet fishing villages, sea breeze, champon noodle stops at the end.</p>
@@ -205,19 +219,19 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
 
   <h3 class="text-sm font-semibold text-orange-400 uppercase tracking-wider mb-3">⛰️ Mountain Routes (Serious)</h3>
   <div class="space-y-3">
-    <div class="route-card glass rounded-2xl p-4 border-l-4 border-orange-500" onclick="showRouteDetail('inasa')">
+    <div class="route-card glass rounded-2xl p-4 border-l-4 border-orange-500" data-route="inasa">
       <div class="flex items-center justify-between mb-2"><h4 class="font-bold text-white">Mount Inasa Climb</h4><span class="text-xs bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded-full">Hard</span></div>
       <div class="flex items-center gap-4 text-sm text-slate-400 mb-2"><span>📏 7km</span><span>📈 300m</span><span>⏱️ ~45min</span></div>
       <p class="text-xs text-slate-400">"Perfectly smooth ascent" to one of Japan's Top 3 Night Views. Reward at the top!</p>
       <div class="mt-2 flex gap-2 flex-wrap"><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">🏔️ Summit</span><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">🌃 Night view</span></div>
     </div>
-    <div class="route-card glass rounded-2xl p-4 border-l-4 border-orange-500" onclick="showRouteDetail('shimabara')">
+    <div class="route-card glass rounded-2xl p-4 border-l-4 border-orange-500" data-route="shimabara">
       <div class="flex items-center justify-between mb-2"><h4 class="font-bold text-white">Shimabara Peninsula Circuit</h4><span class="text-xs bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded-full">Moderate</span></div>
       <div class="flex items-center gap-4 text-sm text-slate-400 mb-2"><span>📏 50km</span><span>📈 800m</span><span>⏱️ ~3hr</span></div>
       <p class="text-xs text-slate-400">Abandoned railway tracks, Unzen volcano views, geopark. Drive to Shimabara, cycle loop.</p>
       <div class="mt-2 flex gap-2 flex-wrap"><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">🌋 Volcano</span><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">🚗 Car+bike</span></div>
     </div>
-    <div class="route-card glass rounded-2xl p-4 border-l-4 border-red-500" onclick="showRouteDetail('unzen')">
+    <div class="route-card glass rounded-2xl p-4 border-l-4 border-red-500" data-route="unzen">
       <div class="flex items-center justify-between mb-2"><h4 class="font-bold text-white">Nagasaki → Unzen Onsen</h4><span class="text-xs bg-red-500/20 text-red-300 px-2 py-0.5 rounded-full">Very Hard</span></div>
       <div class="flex items-center gap-4 text-sm text-slate-400 mb-2"><span>📏 60km</span><span>📈 1,200m</span><span>⏱️ ~4hr</span></div>
       <p class="text-xs text-slate-400">Hot springs reward at the top. "Punchy urban climbs with panoramic views."</p>
@@ -228,18 +242,19 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
   <div class="glass rounded-2xl p-4 mt-4">
     <h4 class="text-sm font-bold text-white mb-2">📊 Elevation Comparison</h4>
     <div class="flex items-end justify-between h-32 gap-2">
-      <div class="flex flex-col items-center gap-1 flex-1"><div class="w-full bg-sky-500/30 rounded-t-lg elevation-bar" style="height: 8%"></div><span class="text-xs text-slate-400">Megami</span><span class="text-xs text-slate-500">50m</span></div>
-      <div class="flex flex-col items-center gap-1 flex-1"><div class="w-full bg-sky-500/30 rounded-t-lg elevation-bar" style="height: 15%"></div><span class="text-xs text-slate-400">Omura</span><span class="text-xs text-slate-500">200m</span></div>
-      <div class="flex flex-col items-center gap-1 flex-1"><div class="w-full bg-sky-500/30 rounded-t-lg elevation-bar" style="height: 20%"></div><span class="text-xs text-slate-400">Nomo</span><span class="text-xs text-slate-500">150m</span></div>
-      <div class="flex flex-col items-center gap-1 flex-1"><div class="w-full bg-orange-500/50 rounded-t-lg elevation-bar" style="height: 35%"></div><span class="text-xs text-orange-400">Inasa</span><span class="text-xs text-slate-500">300m</span></div>
-      <div class="flex flex-col items-center gap-1 flex-1"><div class="w-full bg-orange-500/50 rounded-t-lg elevation-bar" style="height: 70%"></div><span class="text-xs text-orange-400">Shimabara</span><span class="text-xs text-slate-500">800m</span></div>
-      <div class="flex flex-col items-center gap-1 flex-1"><div class="w-full bg-red-500/50 rounded-t-lg elevation-bar" style="height: 100%"></div><span class="text-xs text-red-400">Unzen</span><span class="text-xs text-slate-500">1,200m</span></div>
+      <div class="flex flex-col items-center gap-1 flex-1"><div class="w-full bg-sky-500/30 rounded-t-lg elevation-bar" style="height:8%"></div><span class="text-xs text-slate-400">Megami</span><span class="text-xs text-slate-500">50m</span></div>
+      <div class="flex flex-col items-center gap-1 flex-1"><div class="w-full bg-sky-500/30 rounded-t-lg elevation-bar" style="height:15%"></div><span class="text-xs text-slate-400">Omura</span><span class="text-xs text-slate-500">200m</span></div>
+      <div class="flex flex-col items-center gap-1 flex-1"><div class="w-full bg-sky-500/30 rounded-t-lg elevation-bar" style="height:20%"></div><span class="text-xs text-slate-400">Nomo</span><span class="text-xs text-slate-500">150m</span></div>
+      <div class="flex flex-col items-center gap-1 flex-1"><div class="w-full bg-orange-500/50 rounded-t-lg elevation-bar" style="height:35%"></div><span class="text-xs text-orange-400">Inasa</span><span class="text-xs text-slate-500">300m</span></div>
+      <div class="flex flex-col items-center gap-1 flex-1"><div class="w-full bg-orange-500/50 rounded-t-lg elevation-bar" style="height:70%"></div><span class="text-xs text-orange-400">Shimabara</span><span class="text-xs text-slate-500">800m</span></div>
+      <div class="flex flex-col items-center gap-1 flex-1"><div class="w-full bg-red-500/50 rounded-t-lg elevation-bar" style="height:100%"></div><span class="text-xs text-red-400">Unzen</span><span class="text-xs text-slate-500">1,200m</span></div>
     </div>
   </div>
 </div>
-<div id="content-food" class="hidden section-enter">
-  <h2 class="text-xl font-bold text-white mb-4">🍽️ Where to Eat</h2>
 
+<!-- FOOD -->
+<div id="tab-content-food" class="tab-content hidden">
+  <h2 class="text-xl font-bold text-white mb-4">🍽️ Where to Eat</h2>
   <h3 class="text-sm font-semibold text-amber-400 uppercase tracking-wider mb-3">🏺 Imari (Highest Tabelog)</h3>
   <div class="space-y-3 mb-6">
     <div class="restaurant-card glass rounded-2xl p-4 bg-slate-800/50">
@@ -273,27 +288,14 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
     <div class="restaurant-card glass rounded-2xl p-4 bg-slate-800/50">
       <div class="flex items-start justify-between mb-2"><div><h4 class="font-bold text-white">Shikairou</h4><p class="text-xs text-amber-400">🍜 Original Champon (1899)</p></div><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">¥1,000-2,000</span></div>
       <p class="text-xs text-slate-400 mb-2">The birthplace of champon! Created by Chan Ping Shun for Chinese students. 2F has a Champon Museum.</p>
-      <button onclick="toggleCollapse('shikairou-facts')" class="text-xs text-sky-400">💡 History ▼</button>
-      <div id="shikairou-facts" class="collapsible-content">
-        <div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300">
-          <p>🏛️ Founded in 1899 during the Meiji era. The original recipe was created to provide cheap, nutritious meals for Chinese exchange students in Nagasaki.</p>
-          <p class="mt-1">🥢 The name "champon" comes from the Fujian word for "mixture" — reflecting the many ingredients.</p>
-          <p class="mt-1">🍳 The noodles use <b>touaku</b> (sodium carbonate) instead of regular lye water, giving a unique chewy texture.</p>
-        </div>
-      </div>
+      <button class="toggle-btn text-xs text-sky-400 btn border-0 bg-transparent" data-target="shikairou-facts">💡 History ▼</button>
+      <div id="shikairou-facts" class="collapsible"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300"><p>🏛️ Founded in 1899 during the Meiji era. The original recipe was created to provide cheap, nutritious meals for Chinese exchange students in Nagasaki.</p><p class="mt-1">🥢 The name "champon" comes from the Fujian word for "mixture" — reflecting the many ingredients.</p><p class="mt-1">🍳 The noodles use <b>touaku</b> (sodium carbonate) instead of regular lye water, giving a unique chewy texture.</p></div></div>
     </div>
     <div class="restaurant-card glass rounded-2xl p-4 bg-slate-800/50">
       <div class="flex items-start justify-between mb-2"><div><h4 class="font-bold text-white">Fukusaya</h4><p class="text-xs text-amber-400">🍰 Castella since 1624</p></div><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">¥1,000-2,500</span></div>
       <p class="text-xs text-slate-400 mb-2">Nagasaki's most famous castella shop. Uses the "betsudate" separate-whisking method. Look for the zarame sugar crystals at the bottom!</p>
-      <button onclick="toggleCollapse('castella-facts')" class="text-xs text-sky-400">💡 History ▼</button>
-      <div id="castella-facts" class="collapsible-content">
-        <div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300">
-          <p>🇵🇹 Brought by Portuguese missionaries in the 16th century. The name comes from the <b>Kingdom of Castile</b> in Spain.</p>
-          <p class="mt-1">🎂 Originally called "Pão de Ló" in Portugal. The Japanese version evolved without butter, using eggs, sugar, and flour.</p>
-          <p class="mt-1">👑 Served to the Tokugawa shogunate and to Commodore Perry in 1854!</p>
-          <p class="mt-1">🍫 Try variations: matcha, chocolate, honey, and the classic with zarame (coarse sugar crystals).</p>
-        </div>
-      </div>
+      <button class="toggle-btn text-xs text-sky-400 btn border-0 bg-transparent" data-target="castella-facts">💡 History ▼</button>
+      <div id="castella-facts" class="collapsible"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300"><p>🇵🇹 Brought by Portuguese missionaries in the 16th century. The name comes from the <b>Kingdom of Castile</b> in Spain.</p><p class="mt-1">🎂 Originally called "Pão de Ló" in Portugal. The Japanese version evolved without butter, using eggs, sugar, and flour.</p><p class="mt-1">👑 Served to the Tokugawa shogunate and to Commodore Perry in 1854!</p><p class="mt-1">🍫 Try variations: matcha, chocolate, honey, and the classic with zarame (coarse sugar crystals).</p></div></div>
     </div>
     <div class="restaurant-card glass rounded-2xl p-4 bg-slate-800/50">
       <div class="flex items-start justify-between mb-2"><div><h4 class="font-bold text-white">Hiroshimatei</h4><p class="text-xs text-emerald-400">⭐⭐⭐⭐ Best Okonomiyaki</p></div><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">¥1,000-2,000</span></div>
@@ -302,29 +304,22 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
     </div>
   </div>
 </div>
-<div id="content-onsen" class="hidden section-enter">
-  <h2 class="text-xl font-bold text-white mb-4">♨️ Onsen & Recovery</h2>
 
+<!-- ONSEN -->
+<div id="tab-content-onsen" class="tab-content hidden">
+  <h2 class="text-xl font-bold text-white mb-4">♨️ Onsen & Recovery</h2>
   <div class="space-y-4">
     <div class="onsen-card glass rounded-2xl p-4 bg-slate-800/50">
       <div class="flex items-start justify-between mb-2"><div><h4 class="font-bold text-white">Obama Onsen</h4><p class="text-xs text-orange-400">🔥 105°C — Japan's Hottest Spring!</p></div><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">~45min drive</span></div>
       <p class="text-xs text-slate-400 mb-2">Seaside sunset views over Tachibana Bay. 1,300+ year history, mentioned in the Nara period (710-794).</p>
       <div class="space-y-1 mb-2">
-        <p class="text-xs text-slate-300">🦶 <b>Hot Foot 105</b> — Japan's longest foot bath (105m!), named after the water temp</p>
+        <p class="text-xs text-slate-300">🦶 <b>Hot Foot 105</b> — Japan's longest foot bath (105m!)</p>
         <p class="text-xs text-slate-300">🥚 Free steam cookers — cook eggs, veggies, seafood in hot spring steam</p>
         <p class="text-xs text-slate-300">🍜 Try <b>Obama Champon</b> — a unique local twist on Nagasaki's signature dish</p>
         <p class="text-xs text-slate-300">🎫 <b>Yumeguri-fuda</b> pass (¥1,300) — visit 2 hotel baths + 2 public bathhouses</p>
       </div>
-      <button onclick="toggleCollapse('obama-facts')" class="text-xs text-sky-400">💡 History & Facts ▼</button>
-      <div id="obama-facts" class="collapsible-content">
-        <div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1">
-          <p>📜 Described in the <b>Hizen Fudoki</b> (ancient report compiled in 713 AD).</p>
-          <p class="mt-1">🌡️ Source temperature: <b>105°C</b> — one of the highest in Japan. 15,000 tons/day gush from ~30 springs.</p>
-          <p class="mt-1">🧂 <b>Chloride spring</b> — salt coats the skin, preventing dryness and keeping you warm after bathing.</p>
-          <p class="mt-1">🌅 Located on the west-facing coast — famous for breathtaking sunsets over Tachibana Bay.</p>
-          <p class="mt-1">🏥 Used as a therapeutic bath since 1914 for rheumatism, neuralgia, and skin diseases.</p>
-        </div>
-      </div>
+      <button class="toggle-btn text-xs text-sky-400 btn border-0 bg-transparent" data-target="obama-facts">💡 History & Facts ▼</button>
+      <div id="obama-facts" class="collapsible"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1"><p>📜 Described in the <b>Hizen Fudoki</b> (ancient report compiled in 713 AD).</p><p class="mt-1">🌡️ Source temperature: <b>105°C</b> — one of the highest in Japan. 15,000 tons/day gush from ~30 springs.</p><p class="mt-1">🧂 <b>Chloride spring</b> — salt coats the skin, preventing dryness and keeping you warm after bathing.</p><p class="mt-1">🌅 Located on the west-facing coast — famous for breathtaking sunsets over Tachibana Bay.</p><p class="mt-1">🏥 Used as a therapeutic bath since 1914 for rheumatism, neuralgia, and skin diseases.</p></div></div>
       <div class="flex gap-2 mt-2"><a href="https://en.wikipedia.org/wiki/Obama,_Nagasaki" target="_blank" class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Wiki</a><a href="https://www.google.com/maps/search/Obama+Onsen+Nagasaki" target="_blank" class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Maps</a></div>
     </div>
 
@@ -332,22 +327,13 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
       <div class="flex items-start justify-between mb-2"><div><h4 class="font-bold text-white">Unzen Onsen</h4><p class="text-xs text-orange-400">🌋 "Unzen Hell" — Sulfur Vents</p></div><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">~1h20min drive</span></div>
       <p class="text-xs text-slate-400 mb-2">Japan's first national park (1934). Cool mountain air, sulfur baths, historic Christian martyrdom site.</p>
       <div class="space-y-1 mb-2">
-        <p class="text-xs text-slate-300">🔥 <b>Unzen Jigoku</b> — steaming sulfur vents, bubbling mud pits, otherworldly landscape</p>
+        <p class="text-xs text-slate-300">🔥 <b>Unzen Jigoku</b> — steaming sulfur vents, bubbling mud pits</p>
         <p class="text-xs text-slate-300">🥚 <b>Onsen tamago</b> — soft-boiled eggs cooked in the hells</p>
         <p class="text-xs text-slate-300">🍋 Try <b>Unzen Lemonade</b> — local specialty</p>
-        <p class="text-xs text-slate-300">🏛️ <b>Yunosato Public Bath</b> — 100+ year history, ¥200 entry, local social hub</p>
+        <p class="text-xs text-slate-300">🏛️ <b>Yunosato Public Bath</b> — 100+ year history, ¥200 entry</p>
       </div>
-      <button onclick="toggleCollapse('unzen-facts')" class="text-xs text-sky-400">💡 History & Facts ▼</button>
-      <div id="unzen-facts" class="collapsible-content">
-        <div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1">
-          <p>🏔️ Located at 700m altitude within <b>Unzen-Amakusa National Park</b>, Japan's first national park (est. 1934).</p>
-          <p class="mt-1">🌡️ Spring quality: <b>Highly acidic sulfur spring</b> — strong bactericidal effect, good for skin diseases.</p>
-          <p class="mt-1">✝️ Between 1627-1632, many Christians were martyred here during the persecution. A cross stands in memory.</p>
-          <p class="mt-1">🌋 <b>Mount Unzen</b> erupted 1990-1995, creating <b>Heisei-shinzan</b> (1,486m) — Nagasaki's highest peak.</p>
-          <p class="mt-1">🏨 Once a summer resort for Westerners from Shanghai and Hong Kong — classical buildings remain.</p>
-          <p class="mt-1">💀 The 1792 eruption caused a landslide tsunami killing ~15,000 people — Japan's worst volcanic disaster.</p>
-        </div>
-      </div>
+      <button class="toggle-btn text-xs text-sky-400 btn border-0 bg-transparent" data-target="unzen-facts">💡 History & Facts ▼</button>
+      <div id="unzen-facts" class="collapsible"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1"><p>🏔️ Located at 700m altitude within <b>Unzen-Amakusa National Park</b>, Japan's first national park (est. 1934).</p><p class="mt-1">🌡️ Spring quality: <b>Highly acidic sulfur spring</b> — strong bactericidal effect, good for skin diseases.</p><p class="mt-1">✝️ Between 1627-1632, many Christians were martyred here during the persecution.</p><p class="mt-1">🌋 <b>Mount Unzen</b> erupted 1990-1995, creating <b>Heisei-shinzan</b> (1,486m) — Nagasaki's highest peak.</p><p class="mt-1">🏨 Once a summer resort for Westerners from Shanghai and Hong Kong.</p><p class="mt-1">💀 The 1792 eruption caused a landslide tsunami killing ~15,000 people — Japan's worst volcanic disaster.</p></div></div>
       <div class="flex gap-2 mt-2"><a href="https://en.wikipedia.org/wiki/Mount_Unzen" target="_blank" class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Wiki</a><a href="https://www.google.com/maps/search/Unzen+Onsen" target="_blank" class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Maps</a></div>
     </div>
 
@@ -364,9 +350,10 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
     </div>
   </div>
 </div>
-<div id="content-night" class="hidden section-enter">
-  <h2 class="text-xl font-bold text-white mb-4">🌃 Evening in Nagasaki</h2>
 
+<!-- NIGHT -->
+<div id="tab-content-night" class="tab-content hidden">
+  <h2 class="text-xl font-bold text-white mb-4">🌃 Evening in Nagasaki</h2>
   <div class="glass rounded-2xl p-3 mb-4 border border-purple-500/30">
     <p class="text-xs text-purple-300 text-center">🌙 After 6pm mode activated — showing bars, night views, and late-night food</p>
   </div>
@@ -377,16 +364,8 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
     <p class="text-xs text-purple-400 mb-1">⭐⭐⭐⭐⭐ One of Japan's Top 3 Night Views</p>
     <p class="text-xs text-slate-400 mb-2">"10 Million Dollar Night View" — 360° panoramic deck, rooftop observatory, café ITADAKI.</p>
     <div class="flex gap-2 mb-2 flex-wrap"><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">🚡 Ropeway ¥1,900 RT</span><span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">🚗 Car/taxi ~15min</span></div>
-    <button onclick="toggleCollapse('inasa-night')" class="text-xs text-sky-400">💡 Fun Facts ▼</button>
-    <div id="inasa-night" class="collapsible-content">
-      <div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1">
-        <p>🌃 Certified as one of the <a href="https://en.wikipedia.org/wiki/Three_Views_of_Japan" target="_blank" class="wiki-link">"New Three Great Night Views of the World"</a> in 2012 alongside Monaco and Hong Kong.</p>
-        <p class="mt-1">🏔️ The other two Japanese night views: <b>Mount Hakodate</b> (Hokkaido) and <b>Mount Rokko</b> (Kobe).</p>
-        <p class="mt-1">💡 Called the <b>"10 Million Dollar Night View"</b> (1000万ドルの夜景) — the city lights look like a spilled jewelry box!</p>
-        <p class="mt-1">🚡 Ropeway runs 9:00-22:00, every 15-20 min. Free shuttle from select hotels in evenings.</p>
-        <p class="mt-1">🍽️ Summit restaurant <b>ITADAKI</b> offers dinner with the view.</p>
-      </div>
-    </div>
+    <button class="toggle-btn text-xs text-sky-400 btn border-0 bg-transparent" data-target="inasa-night">💡 Fun Facts ▼</button>
+    <div id="inasa-night" class="collapsible"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1"><p>🌃 Certified as one of the <a href="https://en.wikipedia.org/wiki/Three_Views_of_Japan" target="_blank" class="wiki-link">"New Three Great Night Views of the World"</a> in 2012 alongside Monaco and Hong Kong.</p><p class="mt-1">🏔️ The other two Japanese night views: <b>Mount Hakodate</b> (Hokkaido) and <b>Mount Rokko</b> (Kobe).</p><p class="mt-1">💡 Called the <b>"10 Million Dollar Night View"</b> (1000万ドルの夜景) — the city lights look like a spilled jewelry box!</p><p class="mt-1">🚡 Ropeway runs 9:00-22:00, every 15-20 min. Free shuttle from select hotels in evenings.</p><p class="mt-1">🍽️ Summit restaurant <b>ITADAKI</b> offers dinner with the view.</p></div></div>
   </div>
 
   <h3 class="text-sm font-semibold text-pink-400 uppercase tracking-wider mb-3">🍸 Bars & Nightlife (Shianbashi)</h3>
@@ -418,14 +397,8 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
     <h4 class="font-bold text-white">Kaniya</h4>
     <p class="text-xs text-amber-400 mb-1">Shianbashi · Since 1965</p>
     <p class="text-xs text-slate-400 mb-2">End your night like a local! Omusubi (rice ball) bar. Order the <b>Salted Mackerel (Saba)</b> and <b>Minced Beef (Gyu Soboro)</b> with signature <b>red miso soup</b> — considered the best hangover cure in the prefecture!</p>
-    <button onclick="toggleCollapse('shianbashi-history')" class="text-xs text-sky-400">💡 Shianbashi History ▼</button>
-    <div id="shianbashi-history" class="collapsible-content">
-      <div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1">
-        <p>🏮 Shianbashi was Nagasaki's red light district in the 1600s. The name "Shianbashi" means "Bridge of Careful Thought."</p>
-        <p class="mt-1">🌳 At the fork by Yanagi Kouji street, a weeping willow tree and stone bridge railing remain — the <b>Mikaeri Yanagi</b> (Looking Back Willow), where men would stand wistfully looking back at their companions.</p>
-        <p class="mt-1">🎭 Doza-machi and Shianbashi are now a maze of narrow alleys with izakayas, cocktail bars, and hidden gems — Nagasaki's best nightlife area.</p>
-      </div>
-    </div>
+    <button class="toggle-btn text-xs text-sky-400 btn border-0 bg-transparent" data-target="shianbashi-history">💡 Shianbashi History ▼</button>
+    <div id="shianbashi-history" class="collapsible"><div class="mt-2 p-2 bg-slate-800/50 rounded-lg text-xs text-slate-300 space-y-1"><p>🏮 Shianbashi was Nagasaki's red light district in the 1600s. The name "Shianbashi" means "Bridge of Careful Thought."</p><p class="mt-1">🌳 At the fork by Yanagi Kouji street, a weeping willow tree and stone bridge railing remain — the <b>Mikaeri Yanagi</b> (Looking Back Willow), where men would stand wistfully looking back at their companions.</p><p class="mt-1">🎭 Doza-machi and Shianbashi are now a maze of narrow alleys with izakayas, cocktail bars, and hidden gems — Nagasaki's best nightlife area.</p></div></div>
   </div>
 
   <h3 class="text-sm font-semibold text-emerald-400 uppercase tracking-wider mb-3 mt-4">🍽️ Dinner Restaurants</h3>
@@ -442,14 +415,16 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
     </div>
   </div>
 </div>
-<div id="content-map" class="hidden section-enter">
+
+<!-- MAP -->
+<div id="tab-content-map" class="tab-content hidden">
   <h2 class="text-xl font-bold text-white mb-4">🗺️ Interactive Map</h2>
   <div id="map" class="mb-4"></div>
   <div class="grid grid-cols-2 gap-2 mb-4">
-    <button onclick="showMapLayer('routes')" class="glass text-white text-xs font-semibold py-2 rounded-xl">🚴 Show Routes</button>
-    <button onclick="showMapLayer('food')" class="glass text-white text-xs font-semibold py-2 rounded-xl">🍽️ Restaurants</button>
-    <button onclick="showMapLayer('onsen')" class="glass text-white text-xs font-semibold py-2 rounded-xl">♨️ Onsen</button>
-    <button onclick="showMapLayer('all')" class="glass text-white text-xs font-semibold py-2 rounded-xl">✨ Show All</button>
+    <button class="map-filter btn glass text-white text-xs font-semibold py-2 rounded-xl border-0" data-filter="routes">🚴 Show Routes</button>
+    <button class="map-filter btn glass text-white text-xs font-semibold py-2 rounded-xl border-0" data-filter="food">🍽️ Restaurants</button>
+    <button class="map-filter btn glass text-white text-xs font-semibold py-2 rounded-xl border-0" data-filter="onsen">♨️ Onsen</button>
+    <button class="map-filter btn glass text-white text-xs font-semibold py-2 rounded-xl border-0" data-filter="all">✨ Show All</button>
   </div>
   <div class="glass rounded-2xl p-4">
     <h4 class="text-sm font-bold text-white mb-2">📍 Key Locations</h4>
@@ -468,24 +443,44 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
 
 </main>
 
+<!-- FLOATING BOTTOM NAV -->
 <nav class="floating-nav glass border-t border-slate-700/30 px-4 py-2">
   <div class="flex justify-around items-center max-w-lg mx-auto">
-    <button onclick="showTab('timeline')" class="flex flex-col items-center gap-1 p-2 text-sky-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span class="text-xs">Trip</span></button>
-    <button onclick="showTab('routes')" class="flex flex-col items-center gap-1 p-2 text-slate-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7"/></svg><span class="text-xs">Routes</span></button>
-    <button onclick="showTab('food')" class="flex flex-col items-center gap-1 p-2 text-slate-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg><span class="text-xs">Food</span></button>
-    <button onclick="showTab('onsen')" class="flex flex-col items-center gap-1 p-2 text-slate-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg><span class="text-xs">Onsen</span></button>
-    <button onclick="showTab('night')" class="flex flex-col items-center gap-1 p-2 text-slate-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg><span class="text-xs">Night</span></button>
+    <button class="bottom-tab btn flex flex-col items-center gap-1 p-2 text-sky-400 border-0 bg-transparent" data-tab="timeline">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <span class="text-xs">Trip</span>
+    </button>
+    <button class="bottom-tab btn flex flex-col items-center gap-1 p-2 text-slate-400 border-0 bg-transparent" data-tab="routes">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7"/></svg>
+      <span class="text-xs">Routes</span>
+    </button>
+    <button class="bottom-tab btn flex flex-col items-center gap-1 p-2 text-slate-400 border-0 bg-transparent" data-tab="food">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      <span class="text-xs">Food</span>
+    </button>
+    <button class="bottom-tab btn flex flex-col items-center gap-1 p-2 text-slate-400 border-0 bg-transparent" data-tab="onsen">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>
+      <span class="text-xs">Onsen</span>
+    </button>
+    <button class="bottom-tab btn flex flex-col items-center gap-1 p-2 text-slate-400 border-0 bg-transparent" data-tab="night">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      <span class="text-xs">Night</span>
+    </button>
   </div>
 </nav>
 
+<!-- STRAVA MODAL -->
 <div id="strava-modal" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleStrava()"></div>
+  <div class="modal-backdrop absolute inset-0 bg-black/80 backdrop-blur-sm" style="cursor:pointer"></div>
   <div class="absolute bottom-0 left-0 right-0 glass rounded-t-2xl p-6 max-w-lg mx-auto">
-    <div class="flex items-center justify-between mb-4"><h3 class="text-lg font-bold text-white">Connect Strava</h3><button onclick="toggleStrava()" class="text-slate-400 text-2xl">&times;</button></div>
+    <div class="flex items-center justify-between mb-4"><h3 class="text-lg font-bold text-white">Connect Strava</h3><button class="modal-close btn text-slate-400 text-2xl border-0 bg-transparent">&times;</button></div>
     <p class="text-sm text-slate-400 mb-4">Sync your rides, track segments, and share your Nagasaki cycling adventure with friends.</p>
     <div class="space-y-3">
-      <button class="strava-btn w-full text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.539 0 4.223 12.343h4.172"/></svg>Connect with Strava</button>
-      <button onclick="toggleStrava()" class="w-full bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl">Maybe Later</button>
+      <button class="strava-btn btn w-full text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 border-0">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.539 0 4.223 12.343h4.172"/></svg>
+        Connect with Strava
+      </button>
+      <button class="modal-close btn w-full bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl border-0">Maybe Later</button>
     </div>
     <div class="mt-4 text-xs text-slate-500">
       <p>Features unlocked:</p>
@@ -494,60 +489,161 @@ body { font-family: 'Inter', sans-serif; background: var(--dark); color: #f8fafc
   </div>
 </div>
 
+<!-- ROUTE DETAIL MODAL -->
 <div id="route-modal" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeRouteDetail()"></div>
+  <div class="modal-backdrop absolute inset-0 bg-black/80 backdrop-blur-sm" style="cursor:pointer"></div>
   <div class="absolute bottom-0 left-0 right-0 glass rounded-t-2xl p-6 max-w-lg mx-auto max-h-[80vh] overflow-y-auto">
-    <div class="flex items-center justify-between mb-4"><h3 id="route-modal-title" class="text-lg font-bold text-white">Route Detail</h3><button onclick="closeRouteDetail()" class="text-slate-400 text-2xl">&times;</button></div>
+    <div class="flex items-center justify-between mb-4"><h3 id="route-modal-title" class="text-lg font-bold text-white">Route Detail</h3><button class="modal-close btn text-slate-400 text-2xl border-0 bg-transparent">&times;</button></div>
     <div id="route-modal-content" class="text-sm text-slate-300 space-y-3"></div>
   </div>
 </div>
 
 <script>
+// ===== COUNTDOWN TIMER =====
+function updateCountdown() {
+  const now = new Date();
+  const target = new Date();
+  target.setHours(18, 50, 0, 0);
+
+  // If it's past 18:50 today, show "BOARDING NOW" or "BOARDED"
+  const diff = target - now;
+  const timerEl = document.getElementById('countdown-timer');
+  const statusEl = document.getElementById('preboard-status');
+  const sectionEl = document.getElementById('preboard-section');
+
+  if (!timerEl) return;
+
+  if (diff <= 0) {
+    // Check if past departure time (19:50)
+    const departure = new Date();
+    departure.setHours(19, 50, 0, 0);
+    if (now >= departure) {
+      timerEl.textContent = "DEPARTED";
+      statusEl.textContent = "ONBOARD";
+      sectionEl.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+    } else {
+      timerEl.textContent = "BOARDING NOW";
+      statusEl.textContent = "GO TO GATE";
+      sectionEl.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+    }
+    return;
+  }
+
+  const hours = Math.floor(diff / 3600000);
+  const minutes = Math.floor((diff % 3600000) / 60000);
+  const seconds = Math.floor((diff % 60000) / 1000);
+  timerEl.textContent = 
+    String(hours).padStart(2, '0') + ':' + 
+    String(minutes).padStart(2, '0') + ':' + 
+    String(seconds).padStart(2, '0');
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// ===== LIVE CLOCK =====
+function updateClock() {
+  const now = new Date();
+  const el = document.getElementById('live-clock');
+  if (el) el.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ===== TAB NAVIGATION =====
 function showTab(tabName) {
-  document.querySelectorAll('[id^="content-"]').forEach(el => el.classList.add('hidden'));
-  document.getElementById('content-' + tabName).classList.remove('hidden');
-  document.querySelectorAll('nav button[id^="tab-"]').forEach(btn => { btn.classList.remove('tab-active', 'text-white'); btn.classList.add('text-slate-400'); });
-  document.getElementById('tab-' + tabName).classList.add('tab-active', 'text-white');
-  document.getElementById('tab-' + tabName).classList.remove('text-slate-400');
-  document.querySelectorAll('.floating-nav button').forEach(btn => { btn.classList.remove('text-sky-400'); btn.classList.add('text-slate-400'); });
-  const btnIndex = ['timeline','routes','food','onsen','night'].indexOf(tabName);
-  if (btnIndex >= 0) { document.querySelectorAll('.floating-nav button')[btnIndex].classList.add('text-sky-400'); document.querySelectorAll('.floating-nav button')[btnIndex].classList.remove('text-slate-400'); }
+  // Hide all content
+  document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.add('hidden'); });
+  // Show selected
+  const selected = document.getElementById('tab-content-' + tabName);
+  if (selected) selected.classList.remove('hidden');
+
+  // Update top tabs
+  document.querySelectorAll('.top-tab').forEach(function(btn) {
+    btn.classList.remove('tab-active', 'text-white');
+    btn.classList.add('text-slate-400');
+  });
+  const topBtn = document.querySelector('.top-tab[data-tab="' + tabName + '"]');
+  if (topBtn) { topBtn.classList.add('tab-active', 'text-white'); topBtn.classList.remove('text-slate-400'); }
+
+  // Update bottom tabs
+  document.querySelectorAll('.bottom-tab').forEach(function(btn) {
+    btn.classList.remove('text-sky-400');
+    btn.classList.add('text-slate-400');
+  });
+  const bottomBtn = document.querySelector('.bottom-tab[data-tab="' + tabName + '"]');
+  if (bottomBtn) { bottomBtn.classList.add('text-sky-400'); bottomBtn.classList.remove('text-slate-400'); }
+
+  // Init map if needed
   if (tabName === 'map' && !window.mapInitialized) { setTimeout(initMap, 100); }
 }
 
-function toggleCollapse(id) {
-  const el = document.getElementById(id);
-  el.classList.toggle('open');
-  const btn = el.previousElementSibling;
-  if (btn) btn.innerHTML = btn.innerHTML.includes('▼') ? btn.innerHTML.replace('▼', '▲') : btn.innerHTML.replace('▲', '▼');
-}
+// Top tab click handlers
+document.querySelectorAll('.top-tab').forEach(function(btn) {
+  btn.addEventListener('click', function() { showTab(this.getAttribute('data-tab')); });
+});
 
+// Bottom tab click handlers
+document.querySelectorAll('.bottom-tab').forEach(function(btn) {
+  btn.addEventListener('click', function() { showTab(this.getAttribute('data-tab')); });
+});
+
+// ===== COLLAPSIBLE SECTIONS =====
+document.querySelectorAll('.toggle-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    const targetId = this.getAttribute('data-target');
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.classList.toggle('open');
+      const arrow = this.querySelector('.arrow');
+      if (arrow) arrow.textContent = target.classList.contains('open') ? '▲' : '▼';
+    }
+  });
+});
+
+// ===== CHECK-IN SYSTEM =====
 const checkIns = JSON.parse(localStorage.getItem('nagasaki-checkins') || '{}');
 function updateCheckInButtons() {
-  Object.keys(checkIns).forEach(key => {
-    const btn = document.getElementById('btn-' + key);
-    if (btn) { btn.classList.remove('bg-slate-700', 'text-slate-400'); btn.classList.add('check-in-btn', 'text-white'); btn.innerHTML = '<span>✅</span> Checked In: ' + checkIns[key]; }
+  Object.keys(checkIns).forEach(function(key) {
+    const btn = document.querySelector('button[data-checkin="' + key + '"]');
+    if (btn) {
+      btn.classList.remove('bg-slate-700', 'text-slate-400');
+      btn.classList.add('check-in-btn', 'text-white');
+      btn.innerHTML = '<span>✅</span> Checked In: ' + checkIns[key];
+    }
   });
 }
-function checkIn(location) {
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  checkIns[location] = timeStr;
-  localStorage.setItem('nagasaki-checkins', JSON.stringify(checkIns));
-  updateCheckInButtons();
-  const btn = document.getElementById('btn-' + location);
-  if (btn) btn.innerHTML = '<span class="pulse-dot">✅</span> Checked In: ' + timeStr;
+document.querySelectorAll('button[data-checkin]').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    const location = this.getAttribute('data-checkin');
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    checkIns[location] = timeStr;
+    localStorage.setItem('nagasaki-checkins', JSON.stringify(checkIns));
+    this.classList.remove('bg-slate-700', 'text-slate-400');
+    this.classList.add('check-in-btn', 'text-white');
+    this.innerHTML = '<span class="pulse-dot">✅</span> Checked In: ' + timeStr;
+  });
+});
+updateCheckInButtons();
+
+// ===== STRAVA MODAL =====
+function toggleStrava() {
+  const modal = document.getElementById('strava-modal');
+  if (modal) modal.classList.toggle('hidden');
 }
+document.getElementById('strava-connect').addEventListener('click', toggleStrava);
+document.querySelectorAll('#strava-modal .modal-close, #strava-modal .modal-backdrop').forEach(function(el) {
+  el.addEventListener('click', toggleStrava);
+});
 
-function toggleStrava() { document.getElementById('strava-modal').classList.toggle('hidden'); }
-
+// ===== ROUTE DETAIL MODAL =====
 const routeDetails = {
   megami: { title: 'Megami Bridge Loop', content: '<div class="space-y-2"><p><b>Distance:</b> 15km</p><p><b>Elevation:</b> 50m</p><p><b>Difficulty:</b> Easy (Casual-friendly)</p><p><b>Duration:</b> ~45 minutes</p><p><b>Start:</b> Nagasaki Station area</p><p><b>Highlights:</b> Flat, protected bike lanes, iconic 1.3km cable-stayed bridge over Nagasaki Harbor.</p><p><b>Post-ride:</b> Ark Land Spa (Iojima) — free shuttle from Nagasaki Station</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The Megami Bridge (女神大橋) opened in 1991 and is one of Nagasaki's most recognizable landmarks. The name means "Goddess Bridge."</p></div></div>' },
-  omura: { title: 'Omura Bay Green Route', content: '<div class="space-y-2"><p><b>Distance:</b> 25km</p><p><b>Elevation:</b> 200m</p><p><b>Difficulty:</b> Easy</p><p><b>Duration:</b> ~1.5 hours</p><p><b>Highlights:</b> Virtually traffic-free, tea plantations, coastal views of Omura Bay.</p><p><b>Post-ride:</b> Kidoan onsen — rustic Swiss-style chalet by the sea</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 Omura Bay is known for its pearl cultivation and the "99 Islands" (Kujukushima) are actually part of this bay area. The route is popular with local cyclists for its safety and scenery.</p></div></div>' },
-  nomo: { title: 'Nomo Peninsula Coastal', content: '<div class="space-y-2"><p><b>Distance:</b> 30km</p><p><b>Elevation:</b> 150m</p><p><b>Difficulty:</b> Easy</p><p><b>Duration:</b> ~1.5 hours</p><p><b>Highlights:</b> Quiet fishing villages, sea breeze, champon noodle stops.</p><p><b>Post-ride:</b> Local seafood + hotel bath</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 Cape Nomo (野母崎) is the southernmost point of the Nomo Peninsula. The area is famous for its spiny lobster and fresh seafood. The champon here is particularly good!</p></div></div>' },
-  inasa: { title: 'Mount Inasa Climb', content: '<div class="space-y-2"><p><b>Distance:</b> 7km</p><p><b>Elevation:</b> 300m</p><p><b>Difficulty:</b> Hard (Serious)</p><p><b>Duration:</b> ~45 minutes</p><p><b>Gradient:</b> Average 4-5%, max 8%</p><p><b>Reward:</b> One of Japan's Top 3 Night Views — "10 Million Dollar View"</p><p><b>Post-ride:</b> Hotel bath + night view at summit restaurant ITADAKI</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The climb is described as "perfectly smooth" with consistent gradient. The road is well-maintained and offers great views even during the climb. Best done before sunset to enjoy the night view at the top!</p></div></div>' },
-  shimabara: { title: 'Shimabara Peninsula Circuit', content: '<div class="space-y-2"><p><b>Distance:</b> 50km</p><p><b>Elevation:</b> 800m</p><p><b>Difficulty:</b> Moderate</p><p><b>Duration:</b> ~3 hours</p><p><b>Style:</b> Car + Bike hybrid — drive to Shimabara, cycle the loop</p><p><b>Highlights:</b> Abandoned railway tracks, Unzen volcano views, geopark.</p><p><b>Post-ride:</b> Unzen Onsen — sulfur baths</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The Shimabara Peninsula has over 6 million years of volcanic history. The abandoned railway tracks offer unique cycling paths with stunning coastal and mountain views. The 1792 eruption caused a landslide tsunami killing ~15,000 people.</p></div></div>' },
-  unzen: { title: 'Nagasaki → Unzen Onsen', content: '<div class="space-y-2"><p><b>Distance:</b> 60km</p><p><b>Elevation:</b> 1,200m</p><p><b>Difficulty:</b> Very Hard (Epic)</p><p><b>Duration:</b> ~4 hours</p><p><b>Reward:</b> Hot springs at 700m altitude + "Unzen Hell" geothermal area</p><p><b>Post-ride:</b> Onsen tamago (hot spring eggs) + sulfur bath</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 This is the ultimate Nagasaki cycling challenge. The route starts with punchy urban climbs, transitions to scenic mountain roads, and ends at Japan's first national park. The "Unzen Jigoku" (Hell) steaming vents are a surreal sight. Yunosato Public Bath (¥200) is a 100+ year old local favorite.</p></div></div>' }
+  omura: { title: 'Omura Bay Green Route', content: '<div class="space-y-2"><p><b>Distance:</b> 25km</p><p><b>Elevation:</b> 200m</p><p><b>Difficulty:</b> Easy</p><p><b>Duration:</b> ~1.5 hours</p><p><b>Highlights:</b> Virtually traffic-free, tea plantations, coastal views of Omura Bay.</p><p><b>Post-ride:</b> Kidoan onsen — rustic Swiss-style chalet by the sea</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 Omura Bay is known for its pearl cultivation and the "99 Islands" (Kujukushima) are actually part of this bay area.</p></div></div>' },
+  nomo: { title: 'Nomo Peninsula Coastal', content: '<div class="space-y-2"><p><b>Distance:</b> 30km</p><p><b>Elevation:</b> 150m</p><p><b>Difficulty:</b> Easy</p><p><b>Duration:</b> ~1.5 hours</p><p><b>Highlights:</b> Quiet fishing villages, sea breeze, champon noodle stops.</p><p><b>Post-ride:</b> Local seafood + hotel bath</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 Cape Nomo (野母崎) is the southernmost point of the Nomo Peninsula. Famous for spiny lobster and fresh seafood.</p></div></div>' },
+  inasa: { title: 'Mount Inasa Climb', content: '<div class="space-y-2"><p><b>Distance:</b> 7km</p><p><b>Elevation:</b> 300m</p><p><b>Difficulty:</b> Hard (Serious)</p><p><b>Duration:</b> ~45 minutes</p><p><b>Gradient:</b> Average 4-5%, max 8%</p><p><b>Reward:</b> One of Japan's Top 3 Night Views — "10 Million Dollar View"</p><p><b>Post-ride:</b> Hotel bath + night view at summit restaurant ITADAKI</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The climb is described as "perfectly smooth" with consistent gradient. Best done before sunset to enjoy the night view at the top!</p></div></div>' },
+  shimabara: { title: 'Shimabara Peninsula Circuit', content: '<div class="space-y-2"><p><b>Distance:</b> 50km</p><p><b>Elevation:</b> 800m</p><p><b>Difficulty:</b> Moderate</p><p><b>Duration:</b> ~3 hours</p><p><b>Style:</b> Car + Bike hybrid — drive to Shimabara, cycle the loop</p><p><b>Highlights:</b> Abandoned railway tracks, Unzen volcano views, geopark.</p><p><b>Post-ride:</b> Unzen Onsen — sulfur baths</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The Shimabara Peninsula has over 6 million years of volcanic history. The abandoned railway tracks offer unique cycling paths.</p></div></div>' },
+  unzen: { title: 'Nagasaki → Unzen Onsen', content: '<div class="space-y-2"><p><b>Distance:</b> 60km</p><p><b>Elevation:</b> 1,200m</p><p><b>Difficulty:</b> Very Hard (Epic)</p><p><b>Duration:</b> ~4 hours</p><p><b>Reward:</b> Hot springs at 700m altitude + "Unzen Hell" geothermal area</p><p><b>Post-ride:</b> Onsen tamago (hot spring eggs) + sulfur bath</p><div class="mt-3 p-3 bg-slate-800/50 rounded-lg"><p class="text-xs text-slate-400">💡 The ultimate Nagasaki cycling challenge. Starts with punchy urban climbs, transitions to scenic mountain roads, and ends at Japan's first national park. Yunosato Public Bath (¥200) is a 100+ year old local favorite.</p></div></div>' }
 };
 
 function showRouteDetail(routeId) {
@@ -559,10 +655,18 @@ function showRouteDetail(routeId) {
 }
 function closeRouteDetail() { document.getElementById('route-modal').classList.add('hidden'); }
 
+document.querySelectorAll('.route-card').forEach(function(card) {
+  card.addEventListener('click', function() { showRouteDetail(this.getAttribute('data-route')); });
+});
+document.querySelectorAll('#route-modal .modal-close, #route-modal .modal-backdrop').forEach(function(el) {
+  el.addEventListener('click', closeRouteDetail);
+});
+
+// ===== MAP =====
 let map;
 let mapInitialized = false;
 function initMap() {
-  if (mapInitialized) return;
+  if (mapInitialized || typeof L === 'undefined') return;
   map = L.map('map').setView([32.7447, 129.8736], 11);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
   const markers = [
@@ -577,22 +681,21 @@ function initMap() {
     { pos: [32.7333, 130.2667], title: 'Unzen Onsen', color: '#ec4899', icon: '♨️' },
     { pos: [33.1833, 129.7167], title: 'Sasebo / Kujukushima', color: '#06b6d4', icon: '🏝️' }
   ];
-  markers.forEach(m => {
+  markers.forEach(function(m) {
     const customIcon = L.divIcon({ className: 'custom-marker', html: '<div style="background:' + m.color + ';width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.5);">' + m.icon + '</div>', iconSize: [32, 32], iconAnchor: [16, 16] });
     L.marker(m.pos, { icon: customIcon }).addTo(map).bindPopup(m.title);
   });
   mapInitialized = true;
 }
-function showMapLayer(layer) { console.log('Show layer:', layer); }
 
-function updateClock() {
-  const now = new Date();
-  document.getElementById('live-clock').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-}
-setInterval(updateClock, 1000);
-updateClock();
-updateCheckInButtons();
+// Map filter buttons
+document.querySelectorAll('.map-filter').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    console.log('Map filter:', this.getAttribute('data-filter'));
+  });
+});
 
+// Auto night mode
 const hour = new Date().getHours();
 if (hour >= 18 || hour < 6) { document.body.classList.add('night-mode'); }
 </script>
